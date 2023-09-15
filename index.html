@@ -8,15 +8,6 @@
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
-
-
-        }
-
-        #canvas-container {
-            display: flex;
-            flex-direction: row;
-            align-items: flex-start;
-            justify-content: flex-start;
         }
 
         canvas {
@@ -33,7 +24,7 @@
             left: 10px;
             background-color: white;
             padding: 10px;
-            border: 1px solid #000;
+
         }
 
         h1 {
@@ -90,28 +81,20 @@
             cursor: pointer;
         }
 
-        @media (max-width: 768px) {
-            #info {
-                position: static;
-                margin-top: 20px;
-            }
-        }
+
     </style>
 </head>
 
 <body>
     <h1>Parallelogram and Circles</h1>
     <p>Click on the canvas to select three points. Drag points to create a parallelogram.</p>
+    <canvas id="myCanvas" width="800" height="400"></canvas>
     <div id="info"></div>
-    <div id="canvas-container">
-        <canvas id="myCanvas" width="800" height="400"></canvas>
-    </div>
     <button onclick="clearCanvas()">Clear</button>
     <div id="aboutModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeAboutModal()">&times;</span>
             <h2>About</h2>
-            <ul>
                 <p>The app calculates the radius of an inscribed circle within the parallelogram. Based on the user
                     input which are 3 points selected on the canvas</p>
                 <p>The radius is calculated by finding the angle between two sides of the parallelogram and using
@@ -119,7 +102,6 @@
                 <p>The main calculation can be seen here</p>
                 <code>   function drawYellowCircle() {...}
             </code>
-            </ul>
 
             <p>Author: Protik</p>
         </div>
@@ -347,12 +329,10 @@
             }
 
             if (parallelogramVertices.length === 4) {
-                console.log(parallelogramVertices.length, 'HEREERERE')
                 const parallelogramArea = parallelogram_area
                 infoDiv.innerHTML += `Parallelogram Area: ${parallelogramArea.toFixed(2)} square units<br>`;
-
-                const circleRadius = calculateCircleRadius();
-                infoDiv.innerHTML += `Circle Radius: ${circleRadius.toFixed(2)} units<br>`;
+                const radius = circleRadius;
+                infoDiv.innerHTML += `Circle Radius: ${radius.toFixed(2)} units<br>`;
             }
         }
 
