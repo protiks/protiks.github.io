@@ -142,8 +142,8 @@
         }
 
         function drawYellowCircle() {
-
             let centerX, centerY
+            if (parallelogramVertices.length === 4) {
             let base = calculateDistance(points[0], points[2])
             let hypotenuse = calculateDistance(points[0], points[1])
             let angle_degrees = calculateAngleBetweenLines()
@@ -151,8 +151,6 @@
             let height = hypotenuse * Math.sin(angle_radians)
             parallelogram_area = Math.abs(base * height)
             circleRadius = Math.sqrt(parallelogram_area / Math.PI);
-
-            if (parallelogramVertices.length === 4) {
                 centerX = (parallelogramVertices[0].x + parallelogramVertices[1].x + parallelogramVertices[2].x + parallelogramVertices[3].x) / 4;
                 centerY = (parallelogramVertices[0].y + parallelogramVertices[1].y + parallelogramVertices[2].y + parallelogramVertices[3].y) / 4;
             }
@@ -317,6 +315,7 @@
         function clearCanvas() {
             points.length = 0;
             parallelogramVertices.length = 0;
+            infoDiv.innerHTML = ""
         }
 
         function displayInfo() {
@@ -330,9 +329,9 @@
 
             if (parallelogramVertices.length === 4) {
                 const parallelogramArea = parallelogram_area
-                infoDiv.innerHTML += `Parallelogram Area: ${parallelogramArea.toFixed(2)} square units<br>`;
+                infoDiv.innerHTML += `Parallelogram Area: ${parallelogramArea.toFixed(2)                                        }<br>`;
                 const radius = circleRadius;
-                infoDiv.innerHTML += `Circle Radius: ${radius.toFixed(2)} units<br>`;
+                infoDiv.innerHTML += `Circle Radius: ${radius.toFixed(2)} <br>`;
             }
         }
 
