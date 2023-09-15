@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
     <title>Geometrical Shapes Drawer</title>
     <style>
@@ -157,10 +156,10 @@
 
             context.beginPath();
             context.arc(centerX, centerY, circleRadius, 0, 2 * Math.PI);
+            context.strokeStyle = "yellow";
             context.lineWidth = LINE_WIDTH;
             context.stroke();
-            context.fillStyle = "yellow";
-            context.closePath()
+
         }
 
         function handleCanvasClick(event) {
@@ -272,39 +271,34 @@
         function drawBlueParallelogram() {
             if (parallelogramVertices.length === 4) {
 
-                context.beginPath();
-                // Line A (from vertex 0 to vertex 1)
-                context.moveTo(parallelogramVertices[0].x, parallelogramVertices[0].y);
-                context.lineTo(parallelogramVertices[1].x, parallelogramVertices[1].y);
                 context.strokeStyle = "blue";
                 context.lineWidth = LINE_WIDTH;
+
+                // Line A (from vertex 0 to vertex 1)
+                context.beginPath();
+                context.moveTo(parallelogramVertices[0].x, parallelogramVertices[0].y);
+                context.lineTo(parallelogramVertices[1].x, parallelogramVertices[1].y);
                 context.stroke();
 
                 // Line B (from vertex 1 to vertex 3)
                 context.beginPath();
                 context.moveTo(parallelogramVertices[1].x, parallelogramVertices[1].y);
                 context.lineTo(parallelogramVertices[3].x, parallelogramVertices[3].y);
-                context.strokeStyle = "blue";
-                context.lineWidth = LINE_WIDTH;
                 context.stroke();
 
                 // Line C (from vertex 3 to vertex 2)
                 context.beginPath();
                 context.moveTo(parallelogramVertices[3].x, parallelogramVertices[3].y);
                 context.lineTo(parallelogramVertices[2].x, parallelogramVertices[2].y);
-                context.strokeStyle = "blue";
-                context.lineWidth = LINE_WIDTH;
                 context.stroke();
 
                 // Line D (from vertex 2 to vertex 0)
                 context.beginPath();
                 context.moveTo(parallelogramVertices[2].x, parallelogramVertices[2].y);
                 context.lineTo(parallelogramVertices[0].x, parallelogramVertices[0].y);
-                context.strokeStyle = "blue";
-                context.lineWidth = LINE_WIDTH;
                 context.stroke();
-
             }
+
         }
 
         function calculateDistance(point1, point2) {
