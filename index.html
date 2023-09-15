@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Geometrical Shapes Drawer</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        canvas {
+            border: 1px solid #000;
+            display: block;
+            margin: 20px auto;
+
+            height: auto;
+        }
+
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: white;
+            padding: 10px;
+            border: 1px solid #000;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+        }
+
+        p {
+            text-align: center;
+            font-size: 16px;
+        }
+
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 70%;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .close {
+            color: #888;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            #info {
+                position: static;
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Parallelogram and Circles</h1>
+    <p>Click on the canvas to select three points. Drag points to create a parallelogram.</p>
+    <canvas id="myCanvas" width="800" height="400"></canvas>
+    <button onclick="clearCanvas()">Clear</button>
+    <div id="info"></div>
+    <div id="aboutModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAboutModal()">&times;</span>
+            <h2>About</h2>
+
+            <ul>
+                <p>The program calculates the radius of an inscribed circle within the parallelogram. This circle
+                    touches all four sides of the parallelogram.</p>
+                <p>The radius calculation involves finding the angle between two sides of the parallelogram and using
+                    trigonometric principles to determine the radius.</p>
+                <code>function calculateAngleBetweenLines()</code>
+                <p>The calculated radius and other information about the parallelogram are displayed on the canvas for
+                    your reference.</p>
+            </ul>
+
+            <p>Author: Protik</p>
+        </div>
+
+    </div>
+    <button onclick="showAboutModal()">About</button>
+
+    <script>
+        const CIRCLE_RADIUS = 5.5;
+        const LINE_WIDTH = 2;
+
+        const canvas = document.getElementById("myCanvas");
+        const context = canvas.getContext("2d");
+        const infoDiv = document.getElementById("info");
+
+        const points = [];
+        let selectedPoint = null;
+        let parallelogramVertices = [];
+
+        canvas.addEventListener("click", handleCanvasClick);
+        canvas.addEventListener("mousedown", handleMouseDown);
+        canvas.addEventListener("mousemove", handleMouseMove);
+        canvas.addEventListener("mouseup", handleMouseUp);
+
+        function draw() {
+
+
+            redrawCanvas();
+            drawRedCircles();
+
+
+
+            calculateParallelogramVertices();
+            drawBlueParallelogram();
+            drawYellowCircle();
+
+            displayInfo();
+        }
+
+        function drawYellowCircle() {
+            let centerX, centerY
+            let base = calculateDistance(points[0], points[2])
+            let hypotenuse = calculateDistance(points[0], points[1])
+            let angle_degrees = calculateAngleBetweenLines()
+            let angle_radians = angle_degrees * (Math.PI / 180)
+            let height = hypotenuse * Math.sin(angle_radians)
+            let parallelogram_area = Math.abs(base * height)
+            let circleRadius = Math.sqrt(parallelogram_area / Math.PI);
+
+            if (parallelogramVertices.length === 4) {
+                centerX = (parallelogramVertices[0].x + parallelogramVertices[1].x + parallelogramVertices[2].x + parallelogramVertices[3].x) / 4;
+                centerY = (parallelogramVertices[0].y + parallelogramVertices[1].y + parallelogramVertices[2].y + parallelogramVertices[3].y) / 4;
+            }
+
+            context.beginPath();
+            context.arc(centerX, centerY, circleRadius, 0, 2 * Math.PI);
+            context.strokeStyle = "yellow";
+            context.lineWidth = LINE_WIDTH;
+            context.stroke();
+        }
+
+        function handleCanvasClick(event) {
+            if (points.length < 3) {
+                const x = event.clientX - canvas.getBoundingClientRect().left;
+                const y = event.clientY - canvas.getBoundingClientRect().top;
+
+                points.push({ x, y });
+
+                if (points.length === 3) {
+                    calculateParallelogramVertices();
+                }
+            }
+        }
+
+        function handleMouseDown(event) {
+            const x = event.clientX - canvas.getBoundingClientRect().left;
+            const y = event.clientY - canvas.getBoundingClientRect().top;
+
+            for (const point of points) {
+                const distance = Math.sqrt((x - point.x) ** 2 + (y - point.y) ** 2);
+                if (distance <= CIRCLE_RADIUS) {
+                    selectedPoint = point;
+                    break;
+                }
+            }
+        }
+
+        function handleMouseMove(event) {
+            if (selectedPoint) {
+                const x = event.clientX - canvas.getBoundingClientRect().left;
+                const y = event.clientY - canvas.getBoundingClientRect().top;
+
+                selectedPoint.x = x;
+                selectedPoint.y = y;
+
+                calculateParallelogramVertices();
+            }
+        }
+
+        function handleMouseUp() {
+            selectedPoint = null;
+        }
+
+        function redrawCanvas() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawRedCircles() {
+            for (const point of points) {
+                context.beginPath();
+                context.arc(point.x, point.y, CIRCLE_RADIUS, 0, 2 * Math.PI);
+                context.fillStyle = "red";
+                context.fill();
+            }
+        }
+
+        function calculateAngleBetweenLines() {
+            if (parallelogramVertices.length === 4) {
+                const point1 = {
+                    x: parallelogramVertices[1].x - parallelogramVertices[0].x,
+                    y: parallelogramVertices[1].y - parallelogramVertices[0].y,
+                };
+
+                const point2 = {
+                    x: parallelogramVertices[2].x - parallelogramVertices[0].x,
+                    y: parallelogramVertices[2].y - parallelogramVertices[0].y,
+                };
+
+                // Calculate the dot product of the two Line Vectors
+                const dotProduct = point1.x * point2.x + point1.y * point2.y;
+
+                // Magnitudes of the vectors
+                const magnitudeA = Math.sqrt(point1.x ** 2 + point1.y ** 2);
+                const magnitudeB = Math.sqrt(point2.x ** 2 + point2.y ** 2);
+
+                // Angle in radians
+                let angleInRadians = Math.acos(dotProduct / (magnitudeA * magnitudeB));
+
+                // Convert the angle to degrees
+                let angleInDegrees = (angleInRadians * 180) / Math.PI;
+
+                // Ensure angle is bounded between -180 to 180 
+                if (angleInDegrees > 180) {
+                    angleInDegrees -= 360;
+                }
+
+                // Forcing angle to be Positive in order to only measure the bounded Acute Angle
+                return Math.abs(angleInDegrees)
+            }
+        }
+
+        function calculateParallelogramVertices() {
+            if (points.length === 3) {
+                const vectorX = points[1].x - points[0].x;
+                const vectorY = points[1].y - points[0].y;
+                const fourthVertexX = points[2].x + vectorX;
+                const fourthVertexY = points[2].y + vectorY;
+
+                parallelogramVertices = [
+                    points[0],
+                    points[1],
+                    points[2],
+                    { x: fourthVertexX, y: fourthVertexY }
+                ];
+            }
+        }
+
+        function drawBlueParallelogram() {
+            if (parallelogramVertices.length === 4) {
+                context.beginPath();
+                // Line A (from vertex 0 to vertex 1)
+                context.moveTo(parallelogramVertices[0].x, parallelogramVertices[0].y);
+                context.lineTo(parallelogramVertices[1].x, parallelogramVertices[1].y);
+                context.strokeStyle = "blue";
+                context.lineWidth = LINE_WIDTH;
+                context.stroke();
+
+                // Line B (from vertex 1 to vertex 3)
+                context.beginPath();
+                context.moveTo(parallelogramVertices[1].x, parallelogramVertices[1].y);
+                context.lineTo(parallelogramVertices[3].x, parallelogramVertices[3].y);
+                context.strokeStyle = "blue";
+                context.lineWidth = LINE_WIDTH;
+                context.stroke();
+
+                // Line C (from vertex 3 to vertex 2)
+                context.beginPath();
+                context.moveTo(parallelogramVertices[3].x, parallelogramVertices[3].y);
+                context.lineTo(parallelogramVertices[2].x, parallelogramVertices[2].y);
+                context.strokeStyle = "blue";
+                context.lineWidth = LINE_WIDTH;
+                context.stroke();
+
+                // Line D (from vertex 2 to vertex 0)
+                context.beginPath();
+                context.moveTo(parallelogramVertices[2].x, parallelogramVertices[2].y);
+                context.lineTo(parallelogramVertices[0].x, parallelogramVertices[0].y);
+                context.strokeStyle = "blue";
+                context.lineWidth = LINE_WIDTH;
+                context.stroke();
+            }
+        }
+
+        function calculateDistance(point1, point2) {
+            return Math.sqrt(Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2));
+        }
+
+        // Clear the canvas and reset points
+        function clearCanvas() {
+            points.length = 0;
+            parallelogramVertices.length = 0;
+        }
+
+        function displayInfo() {
+            // Clear previous content
+            infoDiv.innerHTML = "";
+            console.log('here')
+
+            // Display selected points
+            infoDiv.innerHTML += "Selected Points:<br>";
+            for (let i = 0; i < points.length; i++) {
+                infoDiv.innerHTML += `Point ${i + 1}: (${points[i].x.toFixed(2)}, ${points[i].y.toFixed(2)})<br>`;
+            }
+
+            // Display parallelogram area and circle radius (if applicable)
+            if (parallelogramVertices.length === 4) {
+                const parallelogramArea = calculateParallelogramArea();
+                infoDiv.innerHTML += `Parallelogram Area: ${parallelogramArea.toFixed(2)} square units<br>`;
+
+                const circleRadius = calculateCircleRadius();
+                infoDiv.innerHTML += `Circle Radius: ${circleRadius.toFixed(2)} units<br>`;
+            }
+        }
+        function showAboutModal() {
+            const modal = document.getElementById("aboutModal");
+            modal.style.display = "block";
+        }
+
+        function closeAboutModal() {
+            const modal = document.getElementById("aboutModal");
+            modal.style.display = "none";
+        }
+        // Call setup and start the animation loop
+        redrawCanvas()
+        // ANIMATION LOOP AT 60 FRAMES PER SECOND
+        setInterval(draw, 1000 / 60);
+    </script>
+</body>
+
+</html>
